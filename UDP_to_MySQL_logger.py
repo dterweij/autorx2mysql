@@ -2,7 +2,7 @@
 #
 #   radiosonde_auto_rx - Log to MySQL from UDP data
 #
-#   Copyright (C) 2019	Danny Terweij <danny@terweij.nl>
+#   Copyright (C) 2019  Danny Terweij <danny@terweij.nl>
 #   Used the examples provided from Mark Jessop <vk5qi@rfhead.net> the autor of radiosonde_auto_rx
 #   Released under GNU GPL v3 or later
 #
@@ -14,9 +14,9 @@
 #   See here for information: https://github.com/projecthorus/radiosonde_auto_rx/wiki/Configuration-Settings#payload-summary-output
 #   By default these messages are emitted on port 55672, but this can be changed.
 #
-#	You can start the script and watch some output to the screen or start it as script to the background and direct output to dev null
+#   You can start the script and watch some output to the screen or start it as script to the background and direct output to dev null
 #
-# 	Version 0.0.1 - june 2019 - Danny Terweij
+#   Version 0.0.1 - june 2019 - Danny Terweij
 #
 
 import datetime
@@ -98,7 +98,7 @@ CBEIGEBG2  = '\33[106m'
 CWHITEBG2  = '\33[107m'
 
 def cls():
-	# Clear terminal screen
+    # Clear terminal screen
     os.system('cls' if os.name=='nt' else 'clear')
 
 def position_info(listener, balloon):
@@ -293,7 +293,7 @@ def handle_payload_summary(packet):
     _stats = position_info((mylat, mylon, myalt), _last_pos)
     _distance = _stats['straight_distance']/1000.0
 
-	# Direction is from your QTH to the Balloon
+    # Direction is from your QTH to the Balloon
     _direction = degrees_to_cardinal(_stats['bearing'])
 
     _evel = _stats['elevation']
@@ -325,33 +325,30 @@ def handle_payload_summary(packet):
     #print(_comment)
 
     # MySQL processing
-	# Needs a error catching
-    con = db.connect(host=dbhost,
-                 user=dbuser,
-                 passwd=dbpass,
-                 db=dbname)
+    # Needs a error catching
+    con = db.connect(host=dbhost, user=dbuser, passwd=dbpass, db=dbname)
 
-	# Check table sondedata to see if we have a new sonde or sonde to be updated.
-	query = con.cursor(db.cursors.DictCursor)
+    # Check table sondedata to see if we have a new sonde or sonde to be updated.
+    query = con.cursor(db.cursors.DictCursor)
     sql = "SELECT * from sondedata WHERE callsign=%s AND station=%s"
     query.execute(sql, (_callsign,_station,))
     record = query.fetchone()
 
-	# I hope this is the way to check if a query result is empty or not ( I dont like this in Pyrhon :-), if you dont check, script errors fly over the screen.. weird stuff) 
+    # I hope this is the way to check if a query result is empty or not ( I dont like this in Pyrhon :-), if you dont check, script errors fly over the screen.. weird stuff) 
     if record == None:
         # New record
         print("%s%s%s %sNew sonde detected %s at station %s%s") % (CRED,_curtime,CEND,CVIOLET,_callsign, _station,CEND)
-		
-		# Table first_seen
-		# This table only hold the very first data seen from a sonde.
-		sql = " \
+        
+        # Table first_seen
+        # This table only hold the very first data seen from a sonde.
+        sql = " \
         INSERT INTO first_seen ( station, callsign, time, alt, lat, lon, temp, freq, frame, sats, batt, bt, speed, model, distance, direction, comment, evel, bear ) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         query.execute(sql, ( _station, _callsign, _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, ))
         con.commit()
 
-		# Table sondedata
-		# This table will be updated with latest data from a sonde
+        # Table sondedata
+        # This table will be updated with latest data from a sonde
         sql = " \
         INSERT INTO sondedata ( station, callsign, time, alt, lat, lon, temp, freq, frame, sats, batt, bt, speed, model, distance, direction, comment, evel, bear ) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -363,9 +360,9 @@ def handle_payload_summary(packet):
         _id = record['id']
         print("%s%s%s Updating sonde with id %s (%s %s) Freq: %s Distance: %s Km Alt: %s Km Direction: %s") % (CGREEN,_curtime,CEND,_id,_station,_callsign,_freq,round(_distance,1),round(_alt/1000,3),_direction)
  
-		# Table sondedata
-		# Update the existing data
-		sql = "UPDATE sondedata \
+        # Table sondedata
+        # Update the existing data
+        sql = "UPDATE sondedata \
         SET time=%s, alt=%s, lat=%s, lon=%s, temp=%s, freq=%s, frame=%s, sats=%s, batt=%s, bt=%s, speed=%s, model=%s, distance=%s, direction=%s, comment=%s, evel=%s, bear=%s \
         WHERE id=%s"
         query.execute(sql, ( _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, _id, ))
