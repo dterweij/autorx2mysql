@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Gegenereerd op: 04 jun 2019 om 22:06
+-- Gegenereerd op: 09 jun 2019 om 00:33
 -- Serverversie: 5.5.62
 -- PHP-versie: 7.3.6
 
@@ -36,22 +36,23 @@ CREATE TABLE `first_seen` (
   `station` varchar(40) NOT NULL,
   `callsign` varchar(40) NOT NULL,
   `time` varchar(40) NOT NULL,
-  `alt` varchar(40) NOT NULL,
-  `lat` varchar(40) NOT NULL,
-  `lon` varchar(40) NOT NULL,
-  `temp` varchar(40) NOT NULL,
+  `alt` float NOT NULL,
+  `lat` float NOT NULL,
+  `lon` float NOT NULL,
+  `temp` float NOT NULL,
   `freq` varchar(40) NOT NULL,
-  `frame` varchar(40) NOT NULL,
-  `sats` varchar(40) NOT NULL,
-  `batt` varchar(40) NOT NULL,
+  `frame` int(15) NOT NULL,
+  `sats` int(4) NOT NULL,
+  `batt` float NOT NULL,
   `bt` varchar(40) NOT NULL,
-  `speed` varchar(40) NOT NULL,
+  `speed` float NOT NULL,
   `model` varchar(40) NOT NULL,
-  `distance` varchar(40) NOT NULL,
+  `distance` float NOT NULL,
   `direction` varchar(40) NOT NULL,
   `comment` varchar(40) NOT NULL,
-  `evel` varchar(40) NOT NULL,
-  `bear` varchar(40) NOT NULL
+  `evel` float NOT NULL,
+  `bear` float NOT NULL,
+  `hum` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -66,22 +67,23 @@ CREATE TABLE `sondedata` (
   `station` varchar(40) NOT NULL,
   `callsign` varchar(40) NOT NULL,
   `time` varchar(40) NOT NULL,
-  `alt` varchar(40) NOT NULL,
-  `lat` varchar(40) NOT NULL,
-  `lon` varchar(40) NOT NULL,
-  `temp` varchar(40) NOT NULL,
+  `alt` float NOT NULL,
+  `lat` float NOT NULL,
+  `lon` float NOT NULL,
+  `temp` float NOT NULL,
   `freq` varchar(40) NOT NULL,
-  `frame` varchar(40) NOT NULL,
-  `sats` varchar(40) NOT NULL,
-  `batt` varchar(40) NOT NULL,
+  `frame` int(15) NOT NULL,
+  `sats` int(4) NOT NULL,
+  `batt` float NOT NULL,
   `bt` varchar(40) NOT NULL,
-  `speed` varchar(40) NOT NULL,
+  `speed` float NOT NULL,
   `model` varchar(40) NOT NULL,
-  `distance` varchar(40) NOT NULL,
+  `distance` float NOT NULL,
   `direction` varchar(40) NOT NULL,
   `comment` varchar(40) NOT NULL,
-  `evel` varchar(40) NOT NULL,
-  `bear` varchar(40) NOT NULL
+  `evel` float NOT NULL,
+  `bear` float NOT NULL,
+  `hum` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
