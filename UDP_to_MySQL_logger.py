@@ -342,17 +342,17 @@ def handle_payload_summary(packet):
         # Table first_seen
         # This table only hold the very first data seen from a sonde.
         sql = " \
-        INSERT INTO first_seen ( station, callsign, time, alt, lat, lon, temp, freq, frame, sats, batt, bt, speed, model, distance, direction, comment, evel, bear ) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        query.execute(sql, ( _station, _callsign, _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, ))
+        INSERT INTO first_seen ( station, callsign, time, alt, lat, lon, temp, freq, frame, sats, batt, bt, speed, model, distance, direction, comment, evel, bear, hum ) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        query.execute(sql, ( _station, _callsign, _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, _hum, ))
         con.commit()
 
         # Table sondedata
         # This table will be updated with latest data from a sonde
         sql = " \
-        INSERT INTO sondedata ( station, callsign, time, alt, lat, lon, temp, freq, frame, sats, batt, bt, speed, model, distance, direction, comment, evel, bear ) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        query.execute(sql, ( _station, _callsign, _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, ))
+        INSERT INTO sondedata ( station, callsign, time, alt, lat, lon, temp, freq, frame, sats, batt, bt, speed, model, distance, direction, comment, evel, bear, hum ) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        query.execute(sql, ( _station, _callsign, _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, _hum, ))
         con.commit()
 
     elif ( (record['callsign'] == _callsign and record['station'] == _station) ):
@@ -363,9 +363,9 @@ def handle_payload_summary(packet):
         # Table sondedata
         # Update the existing data
         sql = "UPDATE sondedata \
-        SET time=%s, alt=%s, lat=%s, lon=%s, temp=%s, freq=%s, frame=%s, sats=%s, batt=%s, bt=%s, speed=%s, model=%s, distance=%s, direction=%s, comment=%s, evel=%s, bear=%s \
+        SET time=%s, alt=%s, lat=%s, lon=%s, temp=%s, freq=%s, frame=%s, sats=%s, batt=%s, bt=%s, speed=%s, model=%s, distance=%s, direction=%s, comment=%s, evel=%s, bear=%s, hum=%s \
         WHERE id=%s"
-        query.execute(sql, ( _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, _id, ))
+        query.execute(sql, ( _time, _alt, _lat, _lon, _temp, _freq, _frame, _sats, _batt, _bt, _speed, _model, _distance, _direction, _comment, _evel, _bear, _hum, _id, ))
         con.commit()
 
     con.close()
