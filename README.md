@@ -1,5 +1,5 @@
 # autorx2mysql
 sonde auto_rx to MySQL logger via UDP packets
 
-
-To-Do: Simple php webpage to show some stats
+* UDP to MySQl logger
+* Website interface to show (live) data and statistics
