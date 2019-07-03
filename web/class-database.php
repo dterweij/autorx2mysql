@@ -88,18 +88,6 @@ class MyDb {
         }
         return $rows;
     }
-
- 	public function getlastSonde() {
-	    $q = "SELECT * FROM `sondedata` ORDER BY `last_date` DESC LIMIT 1";
-		
-        $rows = array();
-        $result = $this -> query($q);
-        if($result === false) {
-            return false;
-        }
-		$rows = $result -> fetch_row();
-        return $rows;
-    }
 	
 
     /**

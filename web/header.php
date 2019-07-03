@@ -1,4 +1,5 @@
 <?php
 	// Header
 ?>
-<p>SondeData from MySQL</p>
+
+<h2>SondeData from MySQL</h2>
