@@ -1,9 +1,6 @@
 <?php
-$version = "SondeData 1.0";
-
+include("gfx.php");
 $dbt = new MyDb();
-$_nearbysonde = 10; // range within 10km
-//
 
 function MyDateFormat($last_date) {
 	$d = new DateTime($last_date);
@@ -34,12 +31,12 @@ for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	$date = MyDateFormat($result[$i]['last_date']);
 	echo '<tr>';
  	echo '<td>'. $date . '</td>';
-	echo '<td>'. $result[$i]['station'] . '</td>';
+	echo '<td>'. _Station($result[$i]['station']) . '</td>';
 	echo '<td>'. $result[$i]['callsign'] . '</td>';
 	echo '<td>'. $result[$i]['freq'] . '</td>';
 	echo '<td>'. _Rounding($result[$i]['alt'],1) . '</td>';
 	echo '<td>'. $result[$i]['direction'] . '</td>';
-	$_distance = _Rounding($result[$i]['distance'],1);
+	$_distance = number_format(_Rounding($result[$i]['distance'],1), 1);
 	// Closer then 10 KM? give it a color
 	if ( $_distance < $_nearbysonde ) {
 	$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
@@ -51,7 +48,7 @@ echo '</tbody></table>';
 }
 
 function TableLatestSondes($si) {
-global $dbt,$_nearbysonde;
+global $dbt,$_nearbysonde,$mylon,$mylat;
 
 $result = $dbt -> getlatestSondes($si);
 $sondes = count($result); 
@@ -71,21 +68,41 @@ for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	$date = MyDateFormat($result[$i]['last_date']);
 	echo '<tr>';
  	echo '<td>'. $date . '</td>';
-	echo '<td>'. $result[$i]['station'] . '</td>';
+	echo '<td>'. _Station($result[$i]['station']) . '</td>';
 	$sondenumber = $result[$i]['callsign'];
-	// Seems radiosondy and auto_rx uses different serial numbers?
-	// ToDo: DFM06 and IMET? is it always DFM09-18 to replace?
+	// Skip DFM as radiosondy and Radio_auto_rx uses different serials
 	if ($result[$i]['model'] == "DFM") {
-		$sondenumber = str_replace("DFM09-18","DF9",$sondenumber);
+		echo '<td align="center">'. $result[$i]['callsign'] . '</td>';
+	} else {
+		echo '<td align="center"><a href="https://radiosondy.info/sonde.php?sondenumber='. $sondenumber . '" target="new" class="linkbutton">' . $result[$i]['callsign'] . '</a></td>';
 	}
-	echo '<td><a href="https://radiosondy.info/sonde.php?sondenumber='. $sondenumber . '" target="new">' . $result[$i]['callsign'] . '</a></td>';
 	echo '<td>'. $result[$i]['freq'] . '</td>';
 	echo '<td>'. _Rounding($result[$i]['alt'],1) . '</td>';
-	echo '<td>'. $result[$i]['direction'] . '</td>';
-	$_distance = _Rounding($result[$i]['distance'],1);
-	// Closer then 10 KM from your QTH? give it a color
+
+	$bearing = _Rounding(_bearing($mylat,$mylon,$result[$i]['lat'],$result[$i]['lon']),0);
+	echo '<td align="center" valign="middle">';
+	echo '<div class="divTable myTable2">';
+    echo '<div class="divTableBody">';
+    echo '<div class="divTableRow">';
+    
+	echo '<div class="divTableCell" style="width: 33%;">';
+	echo $result[$i]['direction'];
+	echo '</div>';
+
+	echo '<div class="divTableCell" style="width: 33%;">';
+	echo $bearing . '&deg;';
+	echo '</div>';
+
+	echo '<div id="adir" class="divTableCell" style="width: 33%;">';
+	echo '<i class="arrow" style="'. arrowdirection($bearing). '"></i>';
+	echo '<div>';
+	
+	echo '</div></div></div>';
+	echo '</td>';
+
+	$_distance = number_format(_Rounding($result[$i]['distance'],1), 1);
 	if ( $_distance < $_nearbysonde ) {
-	$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
+		$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
 	}
 	echo '<td>'. $_distance . '</td>';
 	echo '</tr>';
@@ -120,7 +137,7 @@ function MaxAlt() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -161,7 +178,7 @@ function MinAlt() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -201,7 +218,7 @@ function FirstMaxAlt() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -242,7 +259,7 @@ function FirstMinAlt() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -284,7 +301,7 @@ function MaxDistance() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -325,7 +342,7 @@ function MinDistance() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -371,7 +388,7 @@ function FirstMaxDistance() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -412,7 +429,7 @@ function FirstMinDistance() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Station:</div>';
-		echo '<div class="divTableCell">'. $result[$i]['station'] . '</div>';
+		echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -466,7 +483,7 @@ function Model() {
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">'. $result[$i]['model'] . '</div>';
  		echo '<div class="divTableCell">'. $result[$i]['cnt'] . 'x</div>';
-		echo '<div class="divTableCell">by '. $result[$i]['station'] .'</div>';
+		echo '<div class="divTableCell">by '. _Station($result[$i]['station']) .'</div>';
 		echo '</div>';
 	}
 	echo '</div></div>';
@@ -625,6 +642,11 @@ function _Rounding($value, $place = 1){
 	$value = floor($value); 
 		if ($modSquad > .5){ 
 			$value++; 
-		} 
+		}
 	return $value / (pow(10, $place)); 
+}
+
+// Remove the standard suffix from station name
+function _Station($station) {
+	return str_replace("_AUTO_RX","",$station);	
 }

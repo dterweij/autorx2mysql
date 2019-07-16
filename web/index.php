@@ -1,14 +1,7 @@
 <?php
-//
-// ######################## TURN OFF ALL ERRORS #############################
-//
-//
-//
-ini_set('error_reporting', -1);
-ini_set('display_errors', 0);
+include("config.php");
 include("class-database.php");
 include("db_data.php");
-
 ?>
 <!DOCTYPE html>
 <html>
