@@ -14,26 +14,22 @@
 </script>
 
 <div class="textbox">
-<div class="titel-box">Data Refresh</div>
-	<div class="divTable myTable">
-		<div class="divTableBody">
-			<div class="divTableRow">
-				<div class="divTableCell"><span>Update in <span id="countdown">15 </span></span></div>
-			</div>
-		</div>
-	</div>
+  <div class="titel-box">Data Refresh</div>
+  <div class="divTable myTable">
+    <div class="divTableBody">
+      <div class="divTableRow">
+        <div class="divTableCell"><span>Update in <span id="countdown">15 </span></span></div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<div class="textbox">
-  <div class="titel-box">Current Sonde (seen in last 10 minutes)</div>
-  	<?php TableCurrentSonde(); ?>
+<div class="split">
+  <?php CurrentSondes(); ?>
 </div>
-  
 <div class="textbox">
   <div class="titel-box">Latest 15 Sondes</div>
   <?php TableLatestSondes(15); ?>
-  </div>
-  
+</div>
 <div class="split">
   <div class="column">
     <div class="textbox">
@@ -45,6 +41,10 @@
       <div class="titel-box">Min Altitude</div>
       <?php MinAlt(); ?>
       <?php FirstMinAlt(); ?>
+    </div>
+    <div class="textbox">
+      <div class="titel-box">Average Altitude</div>
+      <?php AVGAltTable(); ?>
     </div>
   </div>
   <div class="column">
@@ -58,15 +58,19 @@
       <?php MinDistance(); ?>
       <?php FirstMinDistance(); ?>
     </div>
+    <div class="textbox">
+      <div class="titel-box">Average Distance from QTH</div>
+      <?php AVGDistanceTable(); ?>
+    </div>
   </div>
   <div class="column">
     <div class="textbox">
-      <div class="titel-box">Frequency list</div>
-      <?php Freq(); ?>
+      <div class="titel-box">Nearby your QTH</div>
+      <?php NearestTable(); ?>
     </div>
     <div class="textbox">
-      <div class="titel-box">Seen Sondes</div>
-      <?php SeenSondes(); ?>
+      <div class="titel-box">Frequency list</div>
+      <?php Freq(); ?>
     </div>
     <div class="textbox">
       <div class="titel-box">Sonde Model</div>
@@ -75,33 +79,14 @@
   </div>
   <div class="column">
     <div class="textbox">
+      <div class="titel-box">Seen Sondes</div>
+      <?php SeenSondes(); ?>
+    </div>
+    <div class="textbox">
       <div class="titel-box">Monthly Received (All stations)</div>
       <?php MonthlyAllRX(); ?>
     </div>
-    <div class="textbox">
-      <div class="titel-box">Nearby your QTH</div>
-      <?php NearestTable(); ?>
-    </div>
-    <div class="textbox">
-      <div class="titel-box">Title</div>
-      <div class="divTable myTable">
-        <div class="divTableBody">
-          <div class="divTableRow">
-            <div class="divTableCell">Test 1</div>
-            <div class="divTableCell">Test 2</div>
-          </div>
-        </div>
-      </div>
-    </div>
-        <div class="textbox">
-      <div class="titel-box">Average distance from QTH</div>
-      <?php AVGDistanceTable(); ?>
-    </div>
-        <div class="textbox">
-      <div class="titel-box">Average Altitude</div>
-      <?php AVGAltTable(); ?>
-    </div>
-
+    <?php include('info-box.php'); ?>
     <div class="textbox">
       <div class="titel-box">Page Info</div>
       <div class="divTable myTable">

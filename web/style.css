@@ -1,5 +1,7 @@
 @charset "utf-8";
 @import url("https://fonts.googleapis.com/css?family=Mukta");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
 * {
 	box-sizing: border-box;
 }
@@ -93,24 +95,25 @@ html, body {
 table.blueTable {
 	margin-top: 0px;
 	margin-bottom: 0px;
-	border-top: 1px solid rgb(28, 110, 164);
-	border-bottom: 1px solid rgb(28, 110, 164);
-	border-left: 1px solid rgb(28, 110, 164);
-	border-right: 1px solid rgb(28, 110, 164);
+	border: 1px solid rgb(28, 110, 164);
 	background-color: rgb(238, 238, 238);
+	border-width: thin;
 	width: 100%;
 	text-align: left;
 	border-collapse: collapse;
 }
 table.blueTable th {
-	border-top: 1px solid rgb(170, 170, 170);
-	border-bottom: 1px solid rgb(170, 170, 170);
-	border-left: 1px solid rgb(170, 170, 170);
-	border-right: 1px solid rgb(170, 170, 170);
+	border-top: none;
+	border-bottom: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+	border-width: thin;
 	padding: 3px 2px;
 }
 table.blueTable td {
-	border: 1px solid rgb(170, 170, 170);
+	border: 1px solid #CCCCCC;
+	border-top: none;
+	border-width: thin;
 	padding: 3px 2px;
 }
 table.blueTable tbody td {
@@ -121,24 +124,29 @@ table.blueTable tr:nth-child(2n) {
 }
 table.blueTable thead {
 	background: linear-gradient(rgb(85, 146, 187) 0%, rgb(50, 124, 173) 66%, rgb(28, 110, 164) 100%);
-	border-bottom: 2px solid rgb(68, 68, 68);
-	border-top: 0px solid rgb(170, 170, 170);
+	border-bottom: 1px solid rgb(68, 68, 68);
+	border-top: none;
+	border-width: thin;
 }
 table.blueTable thead th {
 	font-size: 15px;
 	font-weight: bold;
 	color: rgb(255, 255, 255);
-	border-left: 2px solid rgb(208, 228, 245);
+	border-left: 1px solid rgb(208, 228, 245);
+	border-width:thin;
 }
 table.blueTable thead th:first-child {
 	border-left: none;
+	border-top: none;
 }
+
 table.blueTable tfoot {
 	font-size: 14px;
 	font-weight: bold;
 	color: rgb(255, 255, 255);
 	background: linear-gradient(rgb(220, 235, 247) 0%, rgb(212, 230, 246) 66%, rgb(208, 228, 245) 100%);
-	border-top: 2px solid rgb(68, 68, 68);
+	border-top: 1px solid #ccc;
+	border-top-width:thin;
 }
 table.blueTable tfoot td {
 	font-size: 14px;
@@ -198,7 +206,7 @@ div.myTable {
 	width: 100%;
 	font-size: 12px;
 	border-collapse: collapse;
-	background-color: rgb(208, 228, 245);
+	background-color: rgb(238, 238, 238);
 }
 div.myTable2 {
 	width: 100%;
@@ -221,6 +229,9 @@ div.myTable2 {
 }
 .divTableRow {
 	display: table-row;
+	border-bottom-style:solid;
+	border-bottom-width:thin;
+	border-bottom-color:#CCCCCC;
 }
 .divTableHeading {
 	display: table-header-group;
@@ -237,6 +248,16 @@ div.myTable2 {
 .divTableBody {
 	display: table-row-group;
 }
+
+.divTableRow:nth-child(2n) {
+	display: table-row;
+	background-color: rgb(208, 228, 245);
+}
+
+.divTableRow:last-child {
+	border-bottom: none;
+}
+
 #adir i {
 	display: inline-block;
 	width: 0;
@@ -274,7 +295,7 @@ div.myTable2 {
 	font-style: normal;
 	height: 18px;
 	line-height: 18px;
-	width: 75px;
+	width: 38px;
 	text-decoration: none;
 	text-align: center;
 	text-shadow: 1px 1px 0px #000;
@@ -289,6 +310,67 @@ div.myTable2 {
 	position: relative;
 	top: 1px;
 }
+
+.blink {
+    animation: blink 2s steps(5, start) infinite;
+    -webkit-animation: blink 1s steps(5, start) infinite;
+}
+
+
+.myButton {
+	margin: 5px;
+	-moz-box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #3d94f6), color-stop(1, #1e62d0));
+	background:-moz-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:-webkit-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:-o-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:-ms-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#3d94f6', endColorstr='#1e62d0',GradientType=0);
+	background-color:#3d94f6;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:6px;
+	border:1px solid #337fed;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #1570cd;
+}
+.myButton:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #1e62d0), color-stop(1, #3d94f6));
+	background:-moz-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:-webkit-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:-o-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:-ms-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:linear-gradient(to bottom, #1e62d0 5%, #3d94f6 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1e62d0', endColorstr='#3d94f6',GradientType=0);
+	background-color:#1e62d0;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+
+
+@keyframes blink {
+    to {
+      visibility: hidden;
+    }
+}
+@-webkit-keyframes blink {
+    to {
+      visibility: hidden;
+    }
+}
+
 
 @media only screen and (max-width: 1000px) {
 .column {

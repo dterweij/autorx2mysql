@@ -1,4 +1,4 @@
 <?php
 // Footer
 ?>
-<p>(c) SondeData 2019</p>
+<h2>(c) SondeData 2019 - Written by Danny Terweij</h2>

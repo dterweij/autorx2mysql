@@ -3,48 +3,187 @@ include("gfx.php");
 $dbt = new MyDb();
 
 function MyDateFormat($last_date) {
+	global $_myformat;
 	$d = new DateTime($last_date);
-	$date = $d->format('d-M-Y H:i:s');
+	$date = $d->format($_myformat);
 	return $date;
 }
 
-function TableCurrentSonde() {
-global $dbt,$_nearbysonde;
+function CurrentSondes() {
+	global $dbt,$_nearbysonde,$mylat,$mylon;
 
-$SQL = "SELECT * FROM `sondedata` WHERE `last_date` >= NOW() - INTERVAL 10 MINUTE ORDER BY `last_date` DESC";
-		
-$result = $dbt -> select($SQL);
-$sondes = count($result); 
+	$SQL = "SELECT * FROM `sondedata` WHERE `last_date` >= NOW() - INTERVAL 10 MINUTE ORDER BY `last_date` DESC";
+	$result = $dbt -> select($SQL);
+	$sondes = count($result); 
 
-echo '<table class="blueTable">';
-echo '<thead><tr>';
-echo '<th>Last Date</th>';
-echo '<th>Station</th>';
-echo '<th>Callsign</th>';
-echo '<th>Frequency</th>';
-echo '<th>Altitude (M)</th>';
-echo '<th>Direction</th>';
-echo '<th>Distance (KM)</th>';
-echo '</tr></thead><tbody>';
+	// No data for 1 day? most likly the logger script is not running or auto rx is crashed
+	$SQL = "SELECT * FROM `sondedata` WHERE `last_date` >= NOW() - INTERVAL 1 DAY ORDER BY `last_date` DESC";
+	$hartbeatresult = $dbt -> select($SQL);
+	$hartbeat = count($hartbeatresult); 
+	
+	if ($sondes > 4)
+		$sondes = 4; // max 4 columns = max 4 receivers/sondes data
 
-for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
+if ($sondes > 1) {
+	for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	$date = MyDateFormat($result[$i]['last_date']);
-	echo '<tr>';
- 	echo '<td>'. $date . '</td>';
-	echo '<td>'. _Station($result[$i]['station']) . '</td>';
-	echo '<td>'. $result[$i]['callsign'] . '</td>';
-	echo '<td>'. $result[$i]['freq'] . '</td>';
-	echo '<td>'. _Rounding($result[$i]['alt'],1) . '</td>';
-	echo '<td>'. $result[$i]['direction'] . '</td>';
 	$_distance = number_format(_Rounding($result[$i]['distance'],1), 1);
-	// Closer then 10 KM? give it a color
 	if ( $_distance < $_nearbysonde ) {
 	$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
 	}
-	echo '<td>'. $_distance . '</td>';
-	echo '</tr>';
+	$bearing = _Rounding(_bearing($mylat,$mylon,$result[$i]['lat'],$result[$i]['lon']),0);
+    
+	echo '<div class="column">';
+	echo '<div class="textbox">';
+	echo '<div class="titel-box">Current ( Seen last 10 minutes ) <i class="fa fa-1x fa-exclamation-circle blink"></i></div>';
+
+	echo '<div class="divTable myTable">';
+	echo '<div class="divTableBody">';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Date:</div>';
+	echo '<div class="divTableCell">'. $date . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Station:</div>';
+	echo '<div class="divTableCell">'. _Station($result[$i]['station']) . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Callsign:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['callsign'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Frame:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['frame'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Altitude:</div>';
+	echo '<div class="divTableCell">'. _Rounding($result[$i]['alt'],1) . ' M</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Distance:</div>';
+	echo '<div class="divTableCell">'. $_distance . ' KM</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Frequency:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['freq'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Bearing:</div>';
+	echo '<div class="divTableCell">'. $bearing . '&deg;</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Direction:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['direction'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Model:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['model'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Latitude:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['lat'] . '</div>';
+	echo '</div>';
+	
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Longtitude:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['lon'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Battery:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['batt'] . ' V</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Temperature:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['temp'] . '&deg;C</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">GPS Satelites:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['sats'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Baloon speed:</div>';
+	echo '<div class="divTableCell">'. _Rounding($result[$i]['speed'],1) . ' m/s</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Evelation:</div>';
+	echo '<div class="divTableCell">'. _Rounding($result[$i]['evel'],1) . '&deg;</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Humidity:</div>';
+	echo '<div class="divTableCell">'. $result[$i]['hum'] . '%</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">BT (what is this?):</div>';
+	echo '<div class="divTableCell">'. $result[$i]['bt'] . '</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Nearest City:</div>';
+	echo '<div class="divTableCell">Not yet implemented</div>';
+	echo '</div>';
+	
+	echo '</div>';
+	echo '</div>';
+
+	echo '</div>';
+	echo '</div>';
+	}
 }
-echo '</tbody></table>';
+	if ($sondes < 1 && $hartbeat > 1) {
+	echo '<div class="column">';
+	echo '<div class="textbox">';
+	echo '<div class="titel-box">Nothing?</div>';
+
+	echo '<div class="divTable myTable">';
+	echo '<div class="divTableBody">';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">There is no radio sonde in the range of your receiver.<br>UDP to MySQL logger and auto_rx might be running.<br>Everything seems to be operational.</div>';
+	echo '</div>';
+
+	echo '</div>';
+	echo '</div>';
+	echo '</div>';
+	echo '</div>';
+	}
+
+	if ($sondes < 1 && $hartbeat < 1) {
+	echo '<div class="column">';
+	echo '<div class="textbox">';
+	echo '<div class="titel-box">Alert!</div>';
+
+	echo '<div class="divTable myTable">';
+	echo '<div class="divTableBody">';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell"><span class="bold" style="color: red;">UDP to MySQL logger script seems not running or auto_rx is not running!</span>(Reason: no data seen in last 24 hours)</div>';
+	echo '</div>';
+
+	echo '</div>';
+	echo '</div>';
+	echo '</div>';
+	echo '</div>';
+	}
+
+	
 }
 
 function TableLatestSondes($si) {
@@ -58,7 +197,8 @@ echo '<thead><tr>';
 echo '<th>Last Date</th>';
 echo '<th>Station</th>';
 echo '<th>Callsign</th>';
-echo '<th>Frequency</th>';
+echo '<th>Map</th>';
+echo '<th>Frequency (MHz)</th>';
 echo '<th>Altitude (M)</th>';
 echo '<th>Direction</th>';
 echo '<th>Distance (KM)</th>';
@@ -69,14 +209,18 @@ for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	echo '<tr>';
  	echo '<td>'. $date . '</td>';
 	echo '<td>'. _Station($result[$i]['station']) . '</td>';
+
 	$sondenumber = $result[$i]['callsign'];
-	// Skip DFM as radiosondy and Radio_auto_rx uses different serials
-	if ($result[$i]['model'] == "DFM") {
-		echo '<td align="center">'. $result[$i]['callsign'] . '</td>';
+	echo '<td>'. $sondenumber . '</td>';
+
+	// Skip DFM/DFN09/iMet as radiosondy and Radio_auto_rx uses different serials
+	if ($result[$i]['model'] == "DFM" || $result[$i]['model'] == "iMet" || $result[$i]['model'] == "DFM09") {
+		echo '<td align="center">&nbsp;</td>';
 	} else {
-		echo '<td align="center"><a href="https://radiosondy.info/sonde.php?sondenumber='. $sondenumber . '" target="new" class="linkbutton">' . $result[$i]['callsign'] . '</a></td>';
+		echo '<td align="center"><a title="RadioSondy" href="https://radiosondy.info/sonde.php?sondenumber='. $sondenumber . '" target="new" class="linkbutton">RS</a>';
+		echo '<a title="SondeHub" href="https://tracker.sondehub.org/?sondehub=1#!mt=osm&mz=7&qm=all&f=RS_'. $sondenumber . '&q=RS_' . $sondenumber . '" target="new" class="linkbutton">SH</a></td>';
 	}
-	echo '<td>'. $result[$i]['freq'] . '</td>';
+	echo '<td>'. str_replace(" MHz","",$result[$i]['freq']) . '</td>';
 	echo '<td>'. _Rounding($result[$i]['alt'],1) . '</td>';
 
 	$bearing = _Rounding(_bearing($mylat,$mylon,$result[$i]['lat'],$result[$i]['lon']),0);
@@ -127,7 +271,7 @@ function MaxAlt() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">Last Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -150,7 +294,6 @@ function MaxAlt() {
 		echo '<div class="divTableCell"><span class="bold">'. _Rounding($result[$i]['alt'],1) . '</span></div>';
 		echo '</div>';
 	}
-	echo '</div></div>';
 }
 
 function MinAlt() {
@@ -168,7 +311,7 @@ function MinAlt() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">Last Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -191,7 +334,8 @@ function MinAlt() {
 		echo '<div class="divTableCell"><span class="bold">'. _Rounding($result[$i]['alt'],1) . '</span></div>';
 		echo '</div>';
 	}
-	echo '</div></div>';}
+	
+	}
 
 function FirstMaxAlt() {
 	global $dbt;
@@ -200,15 +344,12 @@ function FirstMaxAlt() {
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 	
-	echo '<div class="divTable myTable">';
-	echo '<div class="divTableBody">';
-	
 	for ($i = 0; $i <= ( $rows - 1 ); $i++) {
 		$date = MyDateFormat($result[$i]['last_date']);
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">First Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -241,15 +382,13 @@ function FirstMinAlt() {
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 	
-	echo '<div class="divTable myTable">';
-	echo '<div class="divTableBody">';
-	
+
 	for ($i = 0; $i <= ( $rows - 1 ); $i++) {
 		$date = MyDateFormat($result[$i]['last_date']);
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">First Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -291,7 +430,7 @@ function MaxDistance() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">Last Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -314,7 +453,6 @@ function MaxDistance() {
 		echo '<div class="divTableCell"><span class="bold">'. _Rounding($result[$i]['distance'],1) . '</span></div>';
 		echo '</div>';
 	}
-	echo '</div></div>';
 }
 
 function MinDistance() {
@@ -332,7 +470,7 @@ function MinDistance() {
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">Last Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -360,7 +498,6 @@ function MinDistance() {
 		echo '<div class="divTableCell"><span class="bold">'. $_distance. '</span></div>';
 		echo '</div>';
 	}
-	echo '</div></div>';
 }
 
 function FirstMaxDistance() {
@@ -370,15 +507,12 @@ function FirstMaxDistance() {
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 	
-	echo '<div class="divTable myTable">';
-	echo '<div class="divTableBody">';
-	
 	for ($i = 0; $i <= ( $rows - 1 ); $i++) {
 		$date = MyDateFormat($result[$i]['last_date']);
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">First Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -411,15 +545,12 @@ function FirstMinDistance() {
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 	
-	echo '<div class="divTable myTable">';
-	echo '<div class="divTableBody">';
-	
 	for ($i = 0; $i <= ( $rows - 1 ); $i++) {
 		$date = MyDateFormat($result[$i]['last_date']);
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell"><span class="bold">First Seen</span></div>';
-		echo '<div class="divTableCell"></div>';
+		echo '<div class="divTableCell">&nbsp;</div>';
 		echo '</div>';
 
 		echo '<div class="divTableRow">';
@@ -496,34 +627,68 @@ function SeenSondes() {
 	$result = $dbt -> select($SQL);
 	$totalsondes = count($result); 
 
-	$SQL = 'SELECT callsign,COUNT(*) AS cnt FROM sondedata WHERE date(last_date) = CURDATE() GROUP BY callsign ORDER BY callsign ASC, cnt DESC';
+	$SQL = 'SELECT callsign,COUNT(*) AS cnt FROM sondedata WHERE DATE(last_date) = CURDATE() GROUP BY callsign ORDER BY callsign ASC, cnt DESC';
 	$result = $dbt -> select($SQL);
 	$today = count($result); 
 
-	$SQL = 'SELECT callsign,COUNT(*) AS cnt FROM sondedata WHERE date(last_date) = CURDATE() - INTERVAL 1 DAY GROUP BY callsign ORDER BY callsign ASC, cnt DESC';
+	$SQL = 'SELECT callsign,COUNT(*) AS cnt FROM sondedata WHERE DATE(last_date) = CURDATE() - INTERVAL 1 DAY GROUP BY callsign ORDER BY callsign ASC, cnt DESC';
 	$result = $dbt -> select($SQL);
 	$yesterday = count($result); 
 
+	$SQL = 'SELECT callsign,COUNT(*) AS cnt FROM sondedata WHERE YEARWEEK(DATE(last_date)) = YEARWEEK( CURDATE() - INTERVAL 1 WEEK) GROUP BY callsign ORDER BY callsign ASC, cnt DESC';
+	$result = $dbt -> select($SQL);
+	$lastweek = count($result); 
+
+	$SQL = 'SELECT callsign,COUNT(*) AS cnt FROM sondedata WHERE YEARWEEK(DATE(last_date)) = YEARWEEK(CURDATE()) GROUP BY callsign ORDER BY callsign ASC, cnt DESC';
+	$result = $dbt -> select($SQL);
+	$currentweek = count($result); 
+
+	$SQL = 'SELECT DAYOFWEEK(DATE(last_date)), COUNT(*) AS cnt FROM sondedata GROUP BY DAYOFWEEK(DATE(last_date))';
+	$resultdays = $dbt -> select($SQL);
+	$dayrows = count($resultdays); 
+	
 	echo '<div class="divTable myTable">';
 	echo '<div class="divTableBody">';
 
 	echo '<div class="divTableRow">';
 	echo '<div class="divTableCell">Total:</div>';
- 	echo '<div class="divTableCell">'. $totalsondes . '</div>';
-	echo '<div class="divTableCell">Sondes</div>';
+ 	echo '<div class="divTableCell">'. $totalsondes . 'x</div>';
 	echo '</div>';
 
 	echo '<div class="divTableRow">';
 	echo '<div class="divTableCell">Today:</div>';
- 	echo '<div class="divTableCell">'. $today . '</div>';
-	echo '<div class="divTableCell">Sondes</div>';
+ 	echo '<div class="divTableCell">'. $today . 'x</div>';
 	echo '</div>';
 
 	echo '<div class="divTableRow">';
 	echo '<div class="divTableCell">Yesterday:</div>';
- 	echo '<div class="divTableCell">'. $yesterday . '</div>';
-	echo '<div class="divTableCell">Sondes</div>';
+ 	echo '<div class="divTableCell">'. $yesterday . 'x</div>';
 	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Current week:</div>';
+ 	echo '<div class="divTableCell">'. $currentweek . 'x</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">Last week:</div>';
+ 	echo '<div class="divTableCell">'. $lastweek . 'x</div>';
+	echo '</div>';
+
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell"><span class="bold">Daily break down</span></div>';
+	echo '<div class="divTableCell"><span class="bold">(all stations)</span></div>';
+	echo '</div>';
+
+
+    $dayMap = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+	for ($i = 0; $i <= ( $dayrows - 1 ); $i++) {
+	$day_text = $dayMap[$i];
+	echo '<div class="divTableRow">';
+	echo '<div class="divTableCell">At ' . $day_text .'\'s</div>';
+ 	echo '<div class="divTableCell">' . $resultdays[$i]['cnt'] . 'x</div>';
+	echo '</div>';
+	}
 	
 	echo '</div></div>';
 }
@@ -556,7 +721,7 @@ echo '</div></div>';
 function NearestTable() {
 	global $dbt,$_nearbysonde;
 
-	$SQL = "SELECT alt,callsign,MIN(distance) distance,last_date FROM sondedata GROUP BY station,last_date ORDER BY station ASC, distance ASC LIMIT 3";
+	$SQL = "SELECT alt,callsign,MIN(distance) distance,last_date FROM sondedata GROUP BY station,last_date ORDER BY station ASC, distance ASC LIMIT 6";
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 
@@ -567,7 +732,7 @@ function NearestTable() {
 
 	for ($i = 0; $i <= ( $rows - 1 ); $i++) {
 		$d = new DateTime( $result[$i]['last_date'] );
-		$date = $d->format( 'd-M-Y' );
+		$date = $d->format( 'd M Y' );
 		$callsign = $result[$i]['callsign'];
 		$alt = _Rounding($result[$i]['alt'],1);
 		$_distance = _Rounding($result[$i]['distance'],1);
@@ -650,3 +815,4 @@ function _Rounding($value, $place = 1){
 function _Station($station) {
 	return str_replace("_AUTO_RX","",$station);	
 }
+
