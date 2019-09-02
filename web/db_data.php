@@ -2,13 +2,6 @@
 include("gfx.php");
 $dbt = new MyDb();
 
-function MyDateFormat($last_date) {
-	global $_myformat;
-	$d = new DateTime($last_date);
-	$date = $d->format($_myformat);
-	return $date;
-}
-
 function CurrentSondes() {
 	global $dbt,$_nearbysonde,$mylat,$mylon;
 
@@ -24,7 +17,7 @@ function CurrentSondes() {
 	if ($sondes > 4)
 		$sondes = 4; // max 4 columns = max 4 receivers/sondes data
 
-if ($sondes > 1) {
+if ($sondes >= 1) {
 	for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	$date = MyDateFormat($result[$i]['last_date']);
 	$_distance = number_format(_Rounding($result[$i]['distance'],1), 1);
@@ -67,7 +60,7 @@ if ($sondes > 1) {
 
 	echo '<div class="divTableRow">';
 	echo '<div class="divTableCell">Distance:</div>';
-	echo '<div class="divTableCell">'. $_distance . ' KM</div>';
+	echo '<div class="divTableCell">' . _getColor($_distance) . ' KM</div>';
 	echo '</div>';
 
 	echo '<div class="divTableRow">';
@@ -244,10 +237,9 @@ for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	echo '</div></div></div>';
 	echo '</td>';
 
-	$_distance = number_format(_Rounding($result[$i]['distance'],1), 1);
-	if ( $_distance < $_nearbysonde ) {
-		$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
-	}
+		$_distance = _Rounding($result[$i]['distance'],1);
+		$_distance = _getColor($_distance); 
+		
 	echo '<td>'. $_distance . '</td>';
 	echo '</tr>';
 }
@@ -447,10 +439,13 @@ function MaxDistance() {
  		echo '<div class="divTableCell">Callsign:</div>';
 		echo '<div class="divTableCell">'. $result[$i]['callsign'] . '</div>';
 		echo '</div>';
-
+		
+		$_distance = _Rounding($result[$i]['distance'],1);
+		$_distance = _getColor($_distance); 
+		
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Distance (KM):</div>';
-		echo '<div class="divTableCell"><span class="bold">'. _Rounding($result[$i]['distance'],1) . '</span></div>';
+		echo '<div class="divTableCell"><span class="bold">'. $_distance . '</span></div>';
 		echo '</div>';
 	}
 }
@@ -489,9 +484,7 @@ function MinDistance() {
 		echo '</div>';
 
 		$_distance = _Rounding($result[$i]['distance'],1);
-		if ( $_distance < $_nearbysonde ) {
-			$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
-		}
+		$_distance = _getColor($_distance); 
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Distance (KM):</div>';
@@ -529,10 +522,13 @@ function FirstMaxDistance() {
  		echo '<div class="divTableCell">Callsign:</div>';
 		echo '<div class="divTableCell">'. $result[$i]['callsign'] . '</div>';
 		echo '</div>';
-
+		
+		$_distance = _Rounding($result[$i]['distance'],1);
+		$_distance = _getColor($_distance); 
+		
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Distance (KM):</div>';
-		echo '<div class="divTableCell"><span class="bold">'. _Rounding($result[$i]['distance'],1) . '</span></div>';
+		echo '<div class="divTableCell"><span class="bold">'. $_distance . '</span></div>';
 		echo '</div>';
 	}
 	echo '</div></div>';
@@ -569,9 +565,7 @@ function FirstMinDistance() {
 		echo '</div>';
 
 		$_distance = _Rounding($result[$i]['distance'],1);
-		if ( $_distance < $_nearbysonde ) {
-			$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
-		}
+		$_distance = _getColor($_distance); 
 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">Distance (KM):</div>';
@@ -721,7 +715,7 @@ echo '</div></div>';
 function NearestTable() {
 	global $dbt,$_nearbysonde;
 
-	$SQL = "SELECT alt,callsign,MIN(distance) distance,last_date FROM sondedata GROUP BY station,last_date ORDER BY station ASC, distance ASC LIMIT 6";
+	$SQL = "SELECT alt,callsign,MIN(distance) distance,last_date FROM sondedata GROUP BY station,last_date ORDER BY station ASC, distance ASC LIMIT 10";
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 
@@ -736,9 +730,7 @@ function NearestTable() {
 		$callsign = $result[$i]['callsign'];
 		$alt = _Rounding($result[$i]['alt'],1);
 		$_distance = _Rounding($result[$i]['distance'],1);
-		if ( $_distance < $_nearbysonde ) {
-			$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
-		}
+		$_distance = _getColor($_distance); 	
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">' . $date . '</div>';
 		echo '<div class="divTableCell">' . $callsign . '</div>';
@@ -763,9 +755,7 @@ function AVGDistanceTable() {
 
 	for ($i = 0; $i <= ( $rows - 1 ); $i++) {
 		$_distance = _Rounding($result[$i]['distance'],1);
-		if ( $_distance < $_nearbysonde ) {
-			$_distance = '<span class="sondeisclose">' . $_distance . '</span>'; 	
-		}
+		$_distance = _getColor($_distance); 
 		echo '<div class="divTableRow">';
 		echo '<div class="divTableCell">' . $_distance . ' KM</div>';
 		echo '</div>';
@@ -816,3 +806,22 @@ function _Station($station) {
 	return str_replace("_AUTO_RX","",$station);	
 }
 
+// Distance coloring
+function _getColor($n){
+    // between 0 and 6
+    if($n>=0 && $n<6) return '<span class="sondeisclose1">' . $n . '</span>';
+    // between 6 and 20
+    if($n>=6 && $n<20) return '<span class="sondeisclose2">' . $n . '</span>';
+    // between 20 and 35
+    if($n>=20 && $n<35) return '<span class="sondeisclose3">' . $n . '</span>';
+    // Above for 35+
+    return '<span class="sondeisfar">' . $n . '</span>';;
+}
+
+// Format the date and time
+function MyDateFormat($last_date) {
+	global $_myformat;
+	$d = new DateTime($last_date);
+	$date = $d->format($_myformat);
+	return $date;
+}
