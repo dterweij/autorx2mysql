@@ -219,8 +219,8 @@ for ($i = 0; $i <= ( $sondes - 1 ); $i++) {
 	$bearing = _Rounding(_bearing($mylat,$mylon,$result[$i]['lat'],$result[$i]['lon']),0);
 	echo '<td align="center" valign="middle">';
 	echo '<div class="divTable myTable2">';
-    echo '<div class="divTableBody">';
-    echo '<div class="divTableRow">';
+    	echo '<div class="divTableBody">';
+    	echo '<div class="divTableRow">';
     
 	echo '<div class="divTableCell" style="width: 33%;">';
 	echo $result[$i]['direction'];
@@ -688,9 +688,9 @@ function SeenSondes() {
 }
 
 function MonthlyAllRX() {
-global $dbt;
+	global $dbt;
 	
-	$SQL = "SELECT MONTH(last_date) AS MONTH, COUNT(*) as COUNT, YEAR(last_date) as YEAR FROM sondedata GROUP BY MONTH(last_date), YEAR(last_date) ORDER BY station ASC,last_date DESC";
+	$SQL = "SELECT COUNT(*) as COUNT, MONTH(last_date) AS MONTH, YEAR(last_date) as YEAR FROM sondedata GROUP BY MONTH, YEAR ORDER BY YEAR DESC, MONTH DESC";
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 
@@ -715,7 +715,7 @@ echo '</div></div>';
 function NearestTable() {
 	global $dbt,$_nearbysonde;
 
-	$SQL = "SELECT alt,callsign,MIN(distance) distance,last_date FROM sondedata GROUP BY station,last_date ORDER BY station ASC, distance ASC LIMIT 10";
+	$SQL = "SELECT alt,callsign,last_date,MIN(distance) distance FROM sondedata GROUP BY distance,alt,callsign,last_date ORDER BY distance ASC LIMIT 10";
 	$result = $dbt -> select($SQL);
 	$rows = count($result); 
 
